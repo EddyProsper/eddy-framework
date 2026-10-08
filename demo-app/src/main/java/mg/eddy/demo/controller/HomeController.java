@@ -10,7 +10,7 @@ public class HomeController {
     @URLAnnotation(value = "/", httpMethod = HTTPMethod.GET)
     public ModelView home() {
         return new ModelView("home.jsp")
-                .add("applicationName", "Application de test Eddy Framework")
+                .add("applicationName", "Application de test du Framework")
                 .add("message", "Le FrontController, le scan et le rendu JSP fonctionnent.");
     }
 

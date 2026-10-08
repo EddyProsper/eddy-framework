@@ -7,10 +7,10 @@
 <!DOCTYPE html>
 <html lang="fr">
     <head>
-        <meta charset="UTF-8"><title>${title}</title>
+        <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style.css"></head>
         <body>
-            <main class="container"><a href="${pageContext.request.contextPath}/">← Accueil</a>
+            <main class="container"><a class="back-link" href="${pageContext.request.contextPath}/">← Accueil</a>
                 <h1>${title}</h1>
                 <div class="table-wrap"><table>
                     <thead>
@@ -24,7 +24,7 @@
                     </thead>
                     <tbody>
                         <% for (Product product : products) { %>
-                        <tr><td><%= product.id() %></td><td><%= product.name() %></td><td><%= product.category() %></td><td><%= String.format("%,.0f Ar", product.price()) %></td><td><%= product.available() ? "Disponible" : "Rupture" %></td></tr>
+                        <tr><td><%= product.id() %></td><td><%= product.name() %></td><td><%= product.category() %></td><td><%= String.format("%,.0f Ar", product.price()) %></td><td><span class="status <%= product.available() ? "status--available" : "status--unavailable" %>"><%= product.available() ? "Disponible" : "Rupture" %></span></td></tr>
                         <% } %>
                     </tbody>
                 </table>

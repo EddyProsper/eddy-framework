@@ -3,14 +3,17 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${applicationName}</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style.css">
 </head>
 <body>
 <main class="container">
-    <span class="badge">Eddy Framework</span>
-    <h1>${applicationName}</h1>
-    <p class="lead">${message}</p>
+    <header class="page-header">
+        <span class="badge">Eddy Framework</span>
+        <h1>${applicationName}</h1>
+        <p class="lead">${message}</p>
+    </header>
 
     <section class="grid">
         <a class="card" href="${pageContext.request.contextPath}/products">
@@ -25,10 +28,30 @@
         <a class="card" href="${pageContext.request.contextPath}/debug">
             <h2>Retour non ModelView</h2><p>Affiche la page interne des contrôleurs et routes.</p>
         </a>
+        <a class="card card--json" href="${pageContext.request.contextPath}/products/json">
+            <h2>Sprint 6 — Réponse JSON</h2><p>Teste une action annotée avec @Json sans redirection vers une vue.</p>
+        </a>
         <a class="card" href="${pageContext.request.contextPath}/route-inconnue">
             <h2>Erreur 404</h2><p>Teste une URL qui n'existe pas.</p>
         </a>
     </section>
+
+    <form method="post" action="${pageContext.request.contextPath}/products/estimate" class="post-test">
+        <h2>Sprint 7 — Injection des paramètres simples</h2>
+        <p>Les valeurs du formulaire sont converties vers <code>String</code>, <code>int</code> et <code>double</code>.</p>
+        <div class="form-grid">
+            <label>Nom du client
+                <input type="text" name="customerName" value="Alice" required>
+            </label>
+            <label>Quantité
+                <input type="number" name="quantity" value="2" min="1" required>
+            </label>
+            <label>Prix unitaire
+                <input type="number" name="unitPrice" value="19.90" min="0" step="0.01" required>
+            </label>
+        </div>
+        <button type="submit">Calculer le total</button>
+    </form>
 
     <form method="post" action="${pageContext.request.contextPath}/products/create" class="post-test">
         <h2>Test de la route POST</h2>

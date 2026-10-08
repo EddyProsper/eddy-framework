@@ -41,4 +41,13 @@ public class ProductController {
                 .add("title", "Route POST exécutée")
                 .add("message", "Le framework a correctement distingué POST /products/create.");
     }
+
+    @URLAnnotation(value = "/products/estimate", httpMethod = HTTPMethod.POST)
+    public ModelView estimate(String customerName, int quantity, double unitPrice) {
+        double total = quantity * unitPrice;
+        return new ModelView("status/success.jsp")
+                .add("title", "Sprint 7 — Paramètres injectés")
+                .add("message", customerName + " a demandé " + quantity
+                        + " article(s), pour un total de " + String.format("%.2f", total) + " €.");
+    }
 }
