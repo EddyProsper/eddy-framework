@@ -3,6 +3,8 @@ package mg.eddy.demo;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import mg.eddy.demo.controller.ProductController;
@@ -50,5 +52,24 @@ class DemoFrameworkTest {
     @Test
     void urlKeySeparatesHttpMethods() {
         assertNotEquals(new URLKey("/products", HTTPMethod.GET), new URLKey("/products", HTTPMethod.POST));
+    }
+
+    @Test
+    void injectsAndConvertsSimpleRequestParameters() throws Exception {
+        URLProcessor processor = new URLProcessor();
+        processor.processAnnotatedClass(ProductController.class);
+        Map<String, String[]> parameters = new HashMap<>();
+        parameters.put("customerName", new String[] {"Alice"});
+        parameters.put("quantity", new String[] {"3"});
+        parameters.put("unitPrice", new String[] {"12.50"});
+
+        Object result = processor.executeRequest(
+                new URLKey("/products/estimate", HTTPMethod.POST), parameters);
+
+        assertInstanceOf(ModelView.class, result);
+        ModelView modelView = (ModelView) result;
+        assertEquals("status/success.jsp", modelView.getDestination());
+        assertTrue(modelView.getValue("message").toString().contains("37,50")
+                || modelView.getValue("message").toString().contains("37.50"));
     }
 }
