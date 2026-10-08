@@ -1,5 +1,8 @@
 package mg.eddy.demo.controller;
 
+import java.util.List;
+
+import mg.eddy.annotation.Json;
 import mg.eddy.demo.model.Product;
 import mg.eddy.demo.service.ProductService;
 import mg.eddy.annotation.MyController;
@@ -24,6 +27,12 @@ public class ProductController {
         return new ModelView("products/detail.jsp")
                 .add("product", product)
                 .add("statusLabel", product.available() ? "Disponible" : "Indisponible");
+    }
+
+    @Json
+    @URLAnnotation(value = "/products/json", httpMethod = HTTPMethod.GET)
+    public List<Product> json() {
+        return productService.findAll();
     }
 
     @URLAnnotation(value = "/products/create", httpMethod = HTTPMethod.POST)
