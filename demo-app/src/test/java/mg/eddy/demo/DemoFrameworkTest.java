@@ -1,6 +1,9 @@
 package mg.eddy.demo;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import mg.eddy.demo.controller.ProductController;
 import mg.eddy.mapping.HTTPMethod;
@@ -29,6 +32,19 @@ class DemoFrameworkTest {
         assertInstanceOf(ModelView.class, getResult);
         assertEquals("products/list.jsp", ((ModelView) getResult).getDestination());
         assertEquals("status/success.jsp", ((ModelView) postResult).getDestination());
+    }
+
+    @Test
+    void jsonAnnotationMarksActionForJsonResponse() throws Exception {
+        URLProcessor processor = new URLProcessor();
+        processor.processAnnotatedClass(ProductController.class);
+
+        URLKey jsonKey = new URLKey("/products/json", HTTPMethod.GET);
+        Object jsonResult = processor.executeRequest(jsonKey);
+
+        assertInstanceOf(List.class, jsonResult);
+        assertTrue(processor.isJsonRequest(jsonKey));
+        assertFalse(processor.isJsonRequest(new URLKey("/products", HTTPMethod.GET)));
     }
 
     @Test
