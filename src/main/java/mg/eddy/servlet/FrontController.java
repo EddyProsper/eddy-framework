@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import mg.eddy.err.URLNotSupportedException;
+import mg.eddy.binding.ParameterBindingException;
 import mg.eddy.mapping.HTTPMethod;
 import mg.eddy.mapping.URLKey;
 import mg.eddy.mapping.URLProcessor;
@@ -72,10 +73,15 @@ public class FrontController extends HttpServlet {
 
         try {
             String url = getRequestedUrl(request);
+            if (isStaticResource(url)) {
+                forwardStaticResource(request, response);
+                return;
+            }
+
             HTTPMethod method = HTTPMethod.buildHTTPMethod(request.getMethod());
             URLKey key = new URLKey(url, method);
 
-            Object result = urlProcessor.executeRequest(key);
+            Object result = urlProcessor.executeRequest(key, request.getParameterMap());
             
             if (urlProcessor.isAPIRequest(key) || urlProcessor.isJsonRequest(key)) {
                 sendJSONResponse(response, result);
@@ -87,9 +93,26 @@ public class FrontController extends HttpServlet {
             }
         } catch (URLNotSupportedException e) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+        } catch (ParameterBindingException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (ReflectiveOperationException e) {
             throw new ServletException("Unable to execute the controller method", e);
         }
+    }
+
+    private boolean isStaticResource(String url) {
+        return url.startsWith("/assets/");
+    }
+
+    private void forwardStaticResource(
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        RequestDispatcher dispatcher = getServletContext().getNamedDispatcher("default");
+        if (dispatcher == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        dispatcher.forward(request, response);
     }
 
     private void sendJSONResponse(HttpServletResponse response, Object result)
