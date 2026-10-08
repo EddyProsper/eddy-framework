@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mg.eddy.annotation.APIAnnotation;
 import mg.eddy.annotation.Json;
@@ -11,6 +12,7 @@ import mg.eddy.annotation.MyController;
 import mg.eddy.annotation.URLAnnotation;
 import mg.eddy.err.URLAlreadyDefinedException;
 import mg.eddy.err.URLNotSupportedException;
+import mg.eddy.binding.MethodParameterBinder;
 import mg.eddy.util.interfaces.AnnotatedClassesProcessor;
 
 public class URLProcessor implements AnnotatedClassesProcessor {
@@ -18,6 +20,7 @@ public class URLProcessor implements AnnotatedClassesProcessor {
     private final List<Class<?>> controllerClasses = new ArrayList<>();
     private final HashMap<URLKey, URLControllerMap> urlMaps = new HashMap<>();
     private final HashMap<URLKey, URLControllerMap> apiMaps = new HashMap<>();
+    private final MethodParameterBinder parameterBinder = new MethodParameterBinder();
 
     @Override
     public void processAnnotatedClass(Class<?> clazz) throws ReflectiveOperationException, URLAlreadyDefinedException {
@@ -52,15 +55,27 @@ public class URLProcessor implements AnnotatedClassesProcessor {
 
     public Object executeRequest(URLKey url)
             throws URLNotSupportedException, ReflectiveOperationException {
+        return executeRequest(url, new HashMap<String, String[]>());
+    }
+
+    public Object executeRequest(URLKey url, Map<String, String[]> requestParameters)
+            throws URLNotSupportedException, ReflectiveOperationException {
         if (this.apiMaps.containsKey(url)) {
             URLControllerMap map = this.apiMaps.get(url);
-            return map.getReflectMethod().invoke(map.getPrototypeSeed());
+            return invoke(map, requestParameters);
         }
         if (this.urlMaps.containsKey(url)) {
             URLControllerMap map = this.urlMaps.get(url);
-            return map.getReflectMethod().invoke(map.getPrototypeSeed());
+            return invoke(map, requestParameters);
         }
         throw new URLNotSupportedException(url, urlMaps);
+    }
+
+    private Object invoke(URLControllerMap map, Map<String, String[]> requestParameters)
+            throws ReflectiveOperationException {
+        Method method = map.getReflectMethod();
+        Object[] arguments = parameterBinder.bind(method, requestParameters);
+        return method.invoke(map.getPrototypeSeed(), arguments);
     }
 
     public List<Class<?>> getControllerClasses() {
