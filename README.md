@@ -37,3 +37,16 @@ Après le démarrage de Tomcat, l'application est accessible à l'adresse
 
 - Framework : `mg.eddy.*`
 - Application de démonstration : `mg.eddy.demo.*`
+
+## Réponses JSON
+
+Ajoutez `@Json` à une méthode d'action pour sérialiser directement sa valeur de
+retour dans la réponse HTTP, sans effectuer de redirection vers une vue :
+
+```java
+@Json
+@URLAnnotation(value = "/products/json", httpMethod = HTTPMethod.GET)
+public List<Product> productsAsJson() {
+    return productService.findAll();
+}
+```
