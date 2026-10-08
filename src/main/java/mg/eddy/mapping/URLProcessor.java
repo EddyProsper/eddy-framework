@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import mg.eddy.annotation.APIAnnotation;
+import mg.eddy.annotation.Json;
 import mg.eddy.annotation.MyController;
 import mg.eddy.annotation.URLAnnotation;
 import mg.eddy.err.URLAlreadyDefinedException;
@@ -76,5 +77,14 @@ public class URLProcessor implements AnnotatedClassesProcessor {
 
     public boolean isAPIRequest(URLKey key) {
         return apiMaps.containsKey(key);
+    }
+
+    public boolean isJsonRequest(URLKey key) {
+        URLControllerMap mapping = apiMaps.containsKey(key)
+                ? apiMaps.get(key)
+                : urlMaps.get(key);
+
+        return mapping != null
+                && mapping.getReflectMethod().isAnnotationPresent(Json.class);
     }
 }
