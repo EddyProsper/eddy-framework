@@ -100,6 +100,9 @@ public class FrontController extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (ParameterBindingException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        } catch (IllegalStateException e) {
+            response.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+                    "Le fichier dépasse la taille autorisée.");
         } catch (ReflectiveOperationException e) {
             throw new ServletException("Unable to execute the controller method", e);
         }
