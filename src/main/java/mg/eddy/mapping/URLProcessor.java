@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.Part;
 
 import mg.eddy.annotation.APIAnnotation;
 import mg.eddy.annotation.Json;
@@ -60,21 +61,32 @@ public class URLProcessor implements AnnotatedClassesProcessor {
 
     public Object executeRequest(URLKey url, Map<String, String[]> requestParameters)
             throws URLNotSupportedException, ReflectiveOperationException {
+        return executeRequest(url, requestParameters, java.util.Collections.<String, Part>emptyMap());
+    }
+
+    public Object executeRequest(
+            URLKey url,
+            Map<String, String[]> requestParameters,
+            Map<String, Part> uploadedParts)
+            throws URLNotSupportedException, ReflectiveOperationException {
         if (this.apiMaps.containsKey(url)) {
             URLControllerMap map = this.apiMaps.get(url);
-            return invoke(map, requestParameters);
+            return invoke(map, requestParameters, uploadedParts);
         }
         if (this.urlMaps.containsKey(url)) {
             URLControllerMap map = this.urlMaps.get(url);
-            return invoke(map, requestParameters);
+            return invoke(map, requestParameters, uploadedParts);
         }
         throw new URLNotSupportedException(url, urlMaps);
     }
 
-    private Object invoke(URLControllerMap map, Map<String, String[]> requestParameters)
+    private Object invoke(
+            URLControllerMap map,
+            Map<String, String[]> requestParameters,
+            Map<String, Part> uploadedParts)
             throws ReflectiveOperationException {
         Method method = map.getReflectMethod();
-        Object[] arguments = parameterBinder.bind(method, requestParameters);
+        Object[] arguments = parameterBinder.bind(method, requestParameters, uploadedParts);
         return method.invoke(map.getPrototypeSeed(), arguments);
     }
 
