@@ -53,6 +53,18 @@
         <button type="submit">Calculer le total</button>
     </form>
 
+    <form method="post" action="${pageContext.request.contextPath}/files/upload"
+          enctype="multipart/form-data" class="post-test">
+        <h2>Sprint 8 — Upload de fichier</h2>
+        <p>Sélectionnez un fichier de 5 Mo maximum. Le framework injecte automatiquement le fichier dans l’action.</p>
+        <div class="form-grid">
+            <label>Fichier
+                <input type="file" name="file" required>
+            </label>
+        </div>
+        <button type="submit">Uploader le fichier</button>
+    </form>
+
     <form method="post" action="${pageContext.request.contextPath}/products/create" class="post-test">
         <h2>Test de la route POST</h2>
         <p>Le framework actuel ne lie pas encore les champs du formulaire, mais il distingue GET et POST.</p>

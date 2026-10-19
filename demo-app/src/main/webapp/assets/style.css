@@ -138,6 +138,22 @@ input:focus {
     outline: 3px solid rgba(36, 87, 214, 0.14);
 }
 
+input[type="file"] {
+    padding: 7px;
+    background: #f8fafc;
+}
+
+input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    border: 0;
+    border-radius: 6px;
+    padding: 7px 11px;
+    background: #e8efff;
+    color: #2457d6;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 button, .button-link {
     display: inline-flex;
     align-items: center;
