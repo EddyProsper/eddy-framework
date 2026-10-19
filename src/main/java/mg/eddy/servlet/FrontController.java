@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import mg.eddy.err.URLNotSupportedException;
 import mg.eddy.binding.ParameterBindingException;
 import mg.eddy.mapping.HTTPMethod;
@@ -81,7 +83,10 @@ public class FrontController extends HttpServlet {
             HTTPMethod method = HTTPMethod.buildHTTPMethod(request.getMethod());
             URLKey key = new URLKey(url, method);
 
-            Object result = urlProcessor.executeRequest(key, request.getParameterMap());
+            Object result = urlProcessor.executeRequest(
+                    key,
+                    request.getParameterMap(),
+                    collectUploadedParts(request));
             
             if (urlProcessor.isAPIRequest(key) || urlProcessor.isJsonRequest(key)) {
                 sendJSONResponse(response, result);
@@ -98,6 +103,21 @@ public class FrontController extends HttpServlet {
         } catch (ReflectiveOperationException e) {
             throw new ServletException("Unable to execute the controller method", e);
         }
+    }
+
+    private Map<String, Part> collectUploadedParts(HttpServletRequest request)
+            throws IOException, ServletException {
+        Map<String, Part> parts = new LinkedHashMap<>();
+        String contentType = request.getContentType();
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("multipart/")) {
+            return parts;
+        }
+        for (Part part : request.getParts()) {
+            if (part.getSubmittedFileName() != null) {
+                parts.put(part.getName(), part);
+            }
+        }
+        return parts;
     }
 
     private boolean isStaticResource(String url) {
