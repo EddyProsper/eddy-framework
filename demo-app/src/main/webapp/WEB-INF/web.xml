@@ -20,6 +20,11 @@
             <param-name>VIEW_EXTENSIONS</param-name>
             <param-value>jsp,html</param-value>
         </init-param>
+        <multipart-config>
+            <max-file-size>5242880</max-file-size>
+            <max-request-size>6291456</max-request-size>
+            <file-size-threshold>0</file-size-threshold>
+        </multipart-config>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
