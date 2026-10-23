@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.gson.Gson;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +25,7 @@ import mg.eddy.util.ScanUtil;
 public class FrontController extends HttpServlet {
     private static final String DEFAULT_VIEW_PATH = "/WEB-INF/views";
     private static final Set<String> DEFAULT_VIEW_EXTENSIONS = Collections.singleton("jsp");
+    private static final Gson GSON = new Gson();
 
     private URLProcessor urlProcessor;
     private String controllerPackageName;
@@ -75,7 +77,7 @@ public class FrontController extends HttpServlet {
 
             Object result = urlProcessor.executeRequest(key);
             
-            if (urlProcessor.isAPIRequest(key)) {
+            if (urlProcessor.isAPIRequest(key) || urlProcessor.isJsonRequest(key)) {
                 sendJSONResponse(response, result);
             } else if (result instanceof ModelView) {
                 renderModelView(request, response, (ModelView) result);
@@ -94,33 +96,8 @@ public class FrontController extends HttpServlet {
             throws IOException {
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
-        String jsonResponse = convertToJson(result);
-        out.print(jsonResponse);
+        out.print(GSON.toJson(result));
         out.flush();
-    }
-
-    private String convertToJson(Object result) {
-        if (result == null) {
-            return "null";
-        }
-        if (result instanceof String) {
-            return "\"" + escapeJsonString((String) result) + "\"";
-        }
-        if (result instanceof Number) {
-            return result.toString();
-        }
-        if (result instanceof Boolean) {
-            return result.toString();
-        }
-        return "\"" + escapeJsonString(result.toString()) + "\"";
-    }
-
-    private String escapeJsonString(String str) {
-        return str.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
     }
 
     private void renderModelView(
